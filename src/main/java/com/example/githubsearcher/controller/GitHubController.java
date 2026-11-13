@@ -5,8 +5,13 @@ import com.example.githubsearcher.dto.RepositoryResponse;
 import com.example.githubsearcher.dto.SearchRequest;
 import com.example.githubsearcher.dto.SearchResponse;
 import com.example.githubsearcher.service.GitHubService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -29,7 +34,7 @@ import java.util.Map;
  * REST controller exposing primary assignment endpoints under /api/github,
  * while maintaining backward-compatible aliases under /api/repositories.
  */
-@Tag(name = "GitHub Repositories", description = "Search GitHub, persist to PostgreSQL, and retrieve stored repositories with filtering and sorting")
+@Tag(name = "GitHub Repositories", description = "Core APIs: Search GitHub repositories, persist in PostgreSQL, and retrieve stored records with filters and sorting")
 @Validated
 @RestController
 public class GitHubController {
@@ -40,7 +45,7 @@ public class GitHubController {
         this.gitHubService = gitHubService;
     }
 
-    @Operation(summary = "Root endpoint redirecting to Swagger UI documentation")
+    @Hidden
     @GetMapping("/")
     public ResponseEntity<Void> root() {
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -48,15 +53,23 @@ public class GitHubController {
                 .build();
     }
 
-    @Operation(summary = "Health / status check endpoint")
+    @Hidden
     @GetMapping({"/api/github/status", "/api/repositories/status"})
     public Map<String, String> status() {
         return Map.of("status", "UP", "service", "github-searcher");
     }
 
-    @Operation(summary = "Search GitHub repositories and persist results to PostgreSQL",
-            description = "Searches GitHub using the configured token, maps items, updates existing records (preventing duplicates), and returns saved repositories.")
-    @PostMapping({"/api/github/search", "/api/repositories/search"})
+    @Operation(
+            summary = "1. Search GitHub repositories and persist results to PostgreSQL",
+            description = "Searches GitHub using the configured token, maps repository details, upserts existing records to prevent duplicates, and returns saved repositories."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Repositories fetched from GitHub and successfully saved to PostgreSQL",
+                    content = @Content(schema = @Schema(implementation = SearchResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request payload (e.g. blank query)"),
+            @ApiResponse(responseCode = "429", description = "GitHub API rate limit exceeded")
+    })
+    @PostMapping("/api/github/search")
     public ResponseEntity<SearchResponse> searchGitHubRepositories(
             @Valid @RequestBody SearchRequest request
     ) {
@@ -64,7 +77,15 @@ public class GitHubController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Search GitHub repositories and persist results (GET shortcut)")
+    @Hidden
+    @PostMapping("/api/repositories/search")
+    public ResponseEntity<SearchResponse> searchGitHubRepositoriesAlias(
+            @Valid @RequestBody SearchRequest request
+    ) {
+        return searchGitHubRepositories(request);
+    }
+
+    @Hidden
     @GetMapping({"/api/github/search", "/api/repositories/search"})
     public ResponseEntity<SearchResponse> searchGitHubRepositoriesGet(
             @RequestParam @NotBlank(message = "Search query must not be blank") String query,
@@ -88,14 +109,20 @@ public class GitHubController {
         return ResponseEntity.ok(gitHubService.searchAndSave(request));
     }
 
-    @Operation(summary = "Retrieve stored repositories from PostgreSQL",
-            description = "Reads from PostgreSQL with optional filters for language, minimum stars, keyword search, safe sorting (stars, forks, updated), and pagination.")
-    @GetMapping({"/api/github/repositories", "/api/repositories"})
+    @Operation(
+            summary = "2. Retrieve stored repositories from PostgreSQL",
+            description = "Reads from PostgreSQL with optional filters for language, minimum stars, keyword search, safe sorting (stars, forks, updated), and pagination."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Stored repositories retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = RepositoryListResponse.class)))
+    })
+    @GetMapping("/api/github/repositories")
     public ResponseEntity<RepositoryListResponse> getStoredRepositories(
-            @Parameter(description = "Filter by programming language")
+            @Parameter(description = "Filter by programming language (e.g. Java, Python, TypeScript)")
             @RequestParam(required = false) String language,
 
-            @Parameter(description = "Filter repositories with at least this many stars")
+            @Parameter(description = "Filter repositories having at least this many stars")
             @RequestParam(required = false) Integer minStars,
 
             @Parameter(description = "Optional keyword to search in name or description")
@@ -125,13 +152,27 @@ public class GitHubController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Retrieve a single stored repository by its GitHub ID")
+    @Hidden
+    @GetMapping("/api/repositories")
+    public ResponseEntity<RepositoryListResponse> getStoredRepositoriesAlias(
+            @RequestParam(required = false) String language,
+            @RequestParam(required = false) Integer minStars,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "stars") String sort,
+            @RequestParam(defaultValue = "DESC") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return getStoredRepositories(language, minStars, search, sort, direction, page, size);
+    }
+
+    @Hidden
     @GetMapping({"/api/github/repositories/{id}", "/api/repositories/{id}"})
     public ResponseEntity<RepositoryResponse> getStoredRepositoryById(@PathVariable Long id) {
         return ResponseEntity.ok(gitHubService.getStoredRepositoryById(id));
     }
 
-    @Operation(summary = "Delete a stored repository record by its GitHub ID")
+    @Hidden
     @DeleteMapping({"/api/github/repositories/{id}", "/api/repositories/{id}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteStoredRepository(@PathVariable Long id) {

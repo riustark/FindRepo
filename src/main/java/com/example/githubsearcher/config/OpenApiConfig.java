@@ -19,7 +19,7 @@ public class OpenApiConfig {
                 ))
                 .info(new Info()
                         .title("GitHub Repository Searcher API")
-                        .version("1.0")
-                        .description("Search GitHub repositories and persist to PostgreSQL"));
+                        .version("1.0.0")
+                        .description("Backend service to search GitHub repositories, persist them into PostgreSQL, and retrieve stored records with filters and sorting."));
     }
 }

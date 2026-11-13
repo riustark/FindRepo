@@ -206,6 +206,20 @@ class GitHubControllerTest {
     }
 
     @Test
+    void getStoredRepositoriesAliasShouldAlsoWork() throws Exception {
+        RepositoryListResponse mockResponse = RepositoryListResponse.builder()
+                .repositories(List.of())
+                .totalCount(0)
+                .build();
+
+        when(gitHubService.getStoredRepositories(any(), any(), any(), anyString(), anyString(), anyInt(), anyInt()))
+                .thenReturn(mockResponse);
+
+        mockMvc.perform(get("/api/repositories"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void getStoredRepositoriesShouldRejectNegativeMinStars() throws Exception {
         when(gitHubService.getStoredRepositories(any(), eq(-1), any(), anyString(), anyString(), anyInt(), anyInt()))
                 .thenThrow(new IllegalArgumentException("minStars must be greater than or equal to 0"));
