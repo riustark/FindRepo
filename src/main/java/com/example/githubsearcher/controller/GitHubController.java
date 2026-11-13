@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -37,6 +38,14 @@ public class GitHubController {
 
     public GitHubController(GitHubService gitHubService) {
         this.gitHubService = gitHubService;
+    }
+
+    @Operation(summary = "Root endpoint redirecting to Swagger UI documentation")
+    @GetMapping("/")
+    public ResponseEntity<Void> root() {
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/swagger-ui.html"))
+                .build();
     }
 
     @Operation(summary = "Health / status check endpoint")

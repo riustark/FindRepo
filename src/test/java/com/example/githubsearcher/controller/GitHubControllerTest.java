@@ -45,6 +45,13 @@ class GitHubControllerTest {
     private GitHubService gitHubService;
 
     @Test
+    void rootEndpointShouldRedirectToSwaggerUi() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isFound())
+                .andExpect(header().string("Location", "/swagger-ui.html"));
+    }
+
+    @Test
     void statusEndpointShouldReturnUp() throws Exception {
         mockMvc.perform(get("/api/github/status"))
                 .andExpect(status().isOk())
