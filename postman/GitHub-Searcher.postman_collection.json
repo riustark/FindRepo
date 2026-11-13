@@ -1,0 +1,180 @@
+{
+  "info": {
+    "_postman_id": "b3e9b251-5b92-4112-9c1d-872f2e71d3e8",
+    "name": "GitHub Searcher API",
+    "description": "Postman collection for testing the Spring Boot GitHub Repository Searcher backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Search GitHub Repositories (Sample Request)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"spring boot\",\n  \"language\": \"Java\",\n  \"sort\": \"stars\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/github/search",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "search"]
+        },
+        "description": "Searches GitHub API, persists results to PostgreSQL without duplicates, and returns saved repositories."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get Stored Repositories (No Filters)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/github/repositories",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "repositories"]
+        },
+        "description": "Retrieves all stored repositories from PostgreSQL in a repositories array."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Stored Repositories Filtered by Language",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/github/repositories?language=Java",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "repositories"],
+          "query": [
+            {
+              "key": "language",
+              "value": "Java"
+            }
+          ]
+        },
+        "description": "Filters stored repositories by language (case-insensitive)."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Get Stored Repositories Filtered by Minimum Stars",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/github/repositories?minStars=100",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "repositories"],
+          "query": [
+            {
+              "key": "minStars",
+              "value": "100"
+            }
+          ]
+        },
+        "description": "Filters stored repositories with stars >= minStars."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Get Stored Repositories (Language + MinStars + Sort)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/github/repositories?language=Java&minStars=100&sort=stars",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "repositories"],
+          "query": [
+            {
+              "key": "language",
+              "value": "Java"
+            },
+            {
+              "key": "minStars",
+              "value": "100"
+            },
+            {
+              "key": "sort",
+              "value": "stars"
+            }
+          ]
+        },
+        "description": "Retrieves stored repositories filtered by language, minStars, and sorted by stars (or forks, updated)."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Invalid Search Request (Missing/Blank Query - Expect 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"   \",\n  \"language\": \"Java\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/github/search",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "search"]
+        },
+        "description": "Negative test: rejects blank or missing query with HTTP 400 Bad Request."
+      },
+      "response": []
+    },
+    {
+      "name": "7. Invalid Sort Value (Expect 400)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/github/repositories?sort=invalid_sort_property",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "repositories"],
+          "query": [
+            {
+              "key": "sort",
+              "value": "invalid_sort_property"
+            }
+          ]
+        },
+        "description": "Negative test: rejects unsupported sort parameter with HTTP 400 Bad Request and clear error message."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Health Status Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/github/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "github", "status"]
+        },
+        "description": "Verifies that the application and web server are operational."
+      },
+      "response": []
+    }
+  ]
+}
+
