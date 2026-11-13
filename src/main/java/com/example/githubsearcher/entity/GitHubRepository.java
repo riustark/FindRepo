@@ -3,6 +3,7 @@ package com.example.githubsearcher.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,10 @@ import java.time.OffsetDateTime;
  * The GitHub repository ID is used as the primary key to prevent duplicates.
  */
 @Entity
-@Table(name = "github_repositories")
+@Table(name = "github_repositories", indexes = {
+        @Index(name = "idx_repo_language", columnList = "language"),
+        @Index(name = "idx_repo_stars", columnList = "stars")
+})
 @Getter
 @Setter
 @NoArgsConstructor
