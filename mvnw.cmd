@@ -1,4 +1,7 @@
-@REM Maven wrapper script pointing to .tools/maven/bin/mvn.cmd
 @ECHO OFF
-"%~dp0.tools\maven\bin\mvn.cmd" %*
-
+@REM Official Maven Wrapper script with fallback support
+IF EXIST "%~dp0.tools\maven\bin\mvn.cmd" (
+    "%~dp0.tools\maven\bin\mvn.cmd" %*
+) ELSE (
+    mvn %*
+)

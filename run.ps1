@@ -10,5 +10,5 @@ if (Test-Path ".env") {
     Write-Host "Loaded environment variables from .env"
 }
 
-.\mvn.cmd spring-boot:run
+.\mvnw.cmd spring-boot:run
 

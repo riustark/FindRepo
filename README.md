@@ -29,7 +29,7 @@ A production-grade Spring Boot 3 REST API backend that searches GitHub repositor
 
 - **Java**: 17 LTS (OpenJDK)
 - **Framework**: Spring Boot 3.3.5
-- **Build Tool**: Apache Maven 3.9.x (Portable wrapper provided: `.\mvn.cmd`)
+- **Build Tool**: Apache Maven 3.9.x (Maven wrapper provided: `.\mvnw.cmd` / `./mvnw`)
 - **Database**: PostgreSQL 14+ (Local port 5432, Driver: `org.postgresql:postgresql`)
 - **ORM / Persistence**: Spring Data JPA & Hibernate
 - **HTTP Client**: Spring 6 `RestClient` (with connection and response timeouts)
@@ -126,12 +126,12 @@ Run the PowerShell launcher script:
 
 ### Run All Automated Tests
 ```powershell
-.\mvn.cmd test
+.\mvnw.cmd test
 ```
 
 ### Build and Package Executable JAR
 ```powershell
-.\mvn.cmd clean package
+.\mvnw.cmd clean package
 ```
 
 Once running:
