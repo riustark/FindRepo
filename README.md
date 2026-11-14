@@ -222,8 +222,6 @@ Once running:
 ---
 
 ### 3. Additional Auxiliary Endpoints
-- **Get Stored Repository by ID**: `GET /api/github/repositories/{id}`
-- **Delete Stored Repository**: `DELETE /api/github/repositories/{id}` (HTTP 204 No Content)
 - **Health Check**: `GET /api/github/status` (`{"status": "UP", "service": "github-searcher"}`)
 
 ---

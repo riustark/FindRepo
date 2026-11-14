@@ -6,7 +6,6 @@ import com.example.githubsearcher.dto.SearchRequest;
 import com.example.githubsearcher.dto.SearchResponse;
 import com.example.githubsearcher.exception.GitHubApiException;
 import com.example.githubsearcher.exception.GitHubRateLimitException;
-import com.example.githubsearcher.exception.ResourceNotFoundException;
 import com.example.githubsearcher.service.GitHubService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -239,46 +238,5 @@ class GitHubControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("Invalid sort parameter 'invalid_field'. Supported values are: stars, forks, updated"));
-    }
-
-    @Test
-    void getStoredRepositoryByIdShouldReturnRepoWhenFound() throws Exception {
-        RepositoryResponse repo = RepositoryResponse.builder()
-                .id(1001L)
-                .name("spring-boot")
-                .build();
-
-        when(gitHubService.getStoredRepositoryById(1001L)).thenReturn(repo);
-
-        mockMvc.perform(get("/api/github/repositories/1001"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1001))
-                .andExpect(jsonPath("$.name").value("spring-boot"));
-    }
-
-    @Test
-    void getStoredRepositoryByIdShouldReturn404WhenNotFound() throws Exception {
-        when(gitHubService.getStoredRepositoryById(9999L))
-                .thenThrow(new ResourceNotFoundException("Repository not found with ID: 9999"));
-
-        mockMvc.perform(get("/api/github/repositories/9999"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status").value(404));
-    }
-
-    @Test
-    void deleteStoredRepositoryShouldReturnNoContent() throws Exception {
-        mockMvc.perform(delete("/api/github/repositories/1001"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void deleteStoredRepositoryShouldReturn404WhenMissing() throws Exception {
-        doThrow(new ResourceNotFoundException("Repository not found with ID: 9999"))
-                .when(gitHubService).deleteStoredRepository(9999L);
-
-        mockMvc.perform(delete("/api/github/repositories/9999"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status").value(404));
     }
 }

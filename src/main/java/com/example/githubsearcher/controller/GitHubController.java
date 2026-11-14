@@ -1,7 +1,6 @@
 package com.example.githubsearcher.controller;
 
 import com.example.githubsearcher.dto.RepositoryListResponse;
-import com.example.githubsearcher.dto.RepositoryResponse;
 import com.example.githubsearcher.dto.SearchRequest;
 import com.example.githubsearcher.dto.SearchResponse;
 import com.example.githubsearcher.service.GitHubService;
@@ -18,13 +17,10 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -164,18 +160,5 @@ public class GitHubController {
             @RequestParam(defaultValue = "20") int size
     ) {
         return getStoredRepositories(language, minStars, search, sort, direction, page, size);
-    }
-
-    @Hidden
-    @GetMapping({"/api/github/repositories/{id}", "/api/repositories/{id}"})
-    public ResponseEntity<RepositoryResponse> getStoredRepositoryById(@PathVariable Long id) {
-        return ResponseEntity.ok(gitHubService.getStoredRepositoryById(id));
-    }
-
-    @Hidden
-    @DeleteMapping({"/api/github/repositories/{id}", "/api/repositories/{id}"})
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteStoredRepository(@PathVariable Long id) {
-        gitHubService.deleteStoredRepository(id);
     }
 }

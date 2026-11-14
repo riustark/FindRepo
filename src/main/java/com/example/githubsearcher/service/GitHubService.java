@@ -7,7 +7,6 @@ import com.example.githubsearcher.dto.SearchRequest;
 import com.example.githubsearcher.dto.SearchResponse;
 import com.example.githubsearcher.dto.SortField;
 import com.example.githubsearcher.entity.GitHubRepository;
-import com.example.githubsearcher.exception.ResourceNotFoundException;
 import com.example.githubsearcher.repository.GitHubRepositoryDao;
 import com.example.githubsearcher.specification.RepositorySpecification;
 import org.springframework.data.domain.Page;
@@ -114,27 +113,6 @@ public class GitHubService {
                 .size(repoPage.getSize())
                 .totalPages(repoPage.getTotalPages())
                 .build();
-    }
-
-    /**
-     * Retrieves a single repository by its GitHub ID from the local database.
-     */
-    @Transactional(readOnly = true)
-    public RepositoryResponse getStoredRepositoryById(Long id) {
-        return gitHubRepositoryDao.findById(id)
-                .map(this::mapEntityToResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Repository not found with ID: " + id));
-    }
-
-    /**
-     * Deletes a repository record from the local database by its GitHub ID.
-     */
-    @Transactional
-    public void deleteStoredRepository(Long id) {
-        if (!gitHubRepositoryDao.existsById(id)) {
-            throw new ResourceNotFoundException("Repository not found with ID: " + id);
-        }
-        gitHubRepositoryDao.deleteById(id);
     }
 
     private String buildGitHubQuery(SearchRequest request) {

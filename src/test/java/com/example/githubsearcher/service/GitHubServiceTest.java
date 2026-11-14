@@ -5,7 +5,6 @@ import com.example.githubsearcher.dto.RepositoryListResponse;
 import com.example.githubsearcher.dto.SearchRequest;
 import com.example.githubsearcher.dto.SearchResponse;
 import com.example.githubsearcher.entity.GitHubRepository;
-import com.example.githubsearcher.exception.ResourceNotFoundException;
 import com.example.githubsearcher.repository.GitHubRepositoryDao;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -168,39 +167,5 @@ class GitHubServiceTest {
         assertThat(response.getRepositories()).hasSize(1);
         assertThat(response.getRepositories().get(0).getName()).isEqualTo("spring-framework");
         assertThat(response.getTotalCount()).isEqualTo(1);
-    }
-
-    @Test
-    void getStoredRepositoryByIdShouldReturnRepositoryWhenFound() {
-        GitHubRepository repo = GitHubRepository.builder().id(1001L).name("spring-framework").build();
-        when(gitHubRepositoryDao.findById(1001L)).thenReturn(Optional.of(repo));
-
-        assertThat(gitHubService.getStoredRepositoryById(1001L).getName()).isEqualTo("spring-framework");
-    }
-
-    @Test
-    void getStoredRepositoryByIdShouldThrowNotFoundWhenMissing() {
-        when(gitHubRepositoryDao.findById(9999L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> gitHubService.getStoredRepositoryById(9999L))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Repository not found with ID: 9999");
-    }
-
-    @Test
-    void deleteStoredRepositoryShouldDeleteWhenFound() {
-        when(gitHubRepositoryDao.existsById(1001L)).thenReturn(true);
-
-        gitHubService.deleteStoredRepository(1001L);
-
-        verify(gitHubRepositoryDao).deleteById(1001L);
-    }
-
-    @Test
-    void deleteStoredRepositoryShouldThrowWhenMissing() {
-        when(gitHubRepositoryDao.existsById(9999L)).thenReturn(false);
-
-        assertThatThrownBy(() -> gitHubService.deleteStoredRepository(9999L))
-                .isInstanceOf(ResourceNotFoundException.class);
     }
 }
