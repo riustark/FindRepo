@@ -53,7 +53,7 @@ com.example.githubsearcher
 │   └── RestClientConfig.java            # Configures Spring RestClient bean with timeouts, GitHub headers, and PAT authentication
 │
 ├── controller/
-│   └── GitHubController.java            # Exposes required /api/github/* endpoints and legacy /api/repositories/* aliases
+│   └── GitHubController.java            # Exposes required /api/github/* endpoints
 │
 ├── dto/
 │   ├── RepositoryListResponse.java      # Response container returning 'repositories' array with pagination metadata
@@ -144,7 +144,7 @@ Once running:
 ## 7. API Endpoints Reference
 
 ### 1. Search GitHub Repositories (Required Assignment Endpoint)
-- **Method & Path**: `POST /api/github/search` *(Alias: `POST /api/repositories/search`)*
+- **Method & Path**: `POST /api/github/search`
 - **Headers**: `Content-Type: application/json`
 - **Request Body**:
   ```json
@@ -186,7 +186,7 @@ Once running:
 ---
 
 ### 2. Retrieve Stored Repositories (Required Assignment Endpoint)
-- **Method & Path**: `GET /api/github/repositories` *(Alias: `GET /api/repositories`)*
+- **Method & Path**: `GET /api/github/repositories`
 - **Query Parameters**:
   - `language` *(optional)*: Filter by programming language (case-insensitive).
   - `minStars` *(optional)*: Only return repositories with `stars >= minStars`.

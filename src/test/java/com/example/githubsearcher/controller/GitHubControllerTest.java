@@ -56,10 +56,6 @@ class GitHubControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.service").value("github-searcher"));
-
-        // Verify alias
-        mockMvc.perform(get("/api/repositories/status"))
-                .andExpect(status().isOk());
     }
 
     @Test
@@ -94,24 +90,6 @@ class GitHubControllerTest {
                 .andExpect(jsonPath("$.message").value("Repositories fetched and saved successfully"))
                 .andExpect(jsonPath("$.repositories[0].id").value(123456))
                 .andExpect(jsonPath("$.repositories[0].name").value("spring-boot-example"));
-    }
-
-    @Test
-    void searchEndpointAliasShouldAlsoWork() throws Exception {
-        SearchResponse mockResponse = SearchResponse.builder()
-                .message("Repositories fetched and saved successfully")
-                .repositories(List.of())
-                .build();
-
-        when(gitHubService.searchAndSave(any(SearchRequest.class))).thenReturn(mockResponse);
-
-        SearchRequest request = SearchRequest.builder().query("spring").build();
-
-        mockMvc.perform(post("/api/repositories/search")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Repositories fetched and saved successfully"));
     }
 
     @Test
@@ -202,20 +180,6 @@ class GitHubControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.repositories[0].name").value("spring-boot"))
                 .andExpect(jsonPath("$.totalCount").value(1));
-    }
-
-    @Test
-    void getStoredRepositoriesAliasShouldAlsoWork() throws Exception {
-        RepositoryListResponse mockResponse = RepositoryListResponse.builder()
-                .repositories(List.of())
-                .totalCount(0)
-                .build();
-
-        when(gitHubService.getStoredRepositories(any(), any(), any(), anyString(), anyString(), anyInt(), anyInt()))
-                .thenReturn(mockResponse);
-
-        mockMvc.perform(get("/api/repositories"))
-                .andExpect(status().isOk());
     }
 
     @Test

@@ -28,13 +28,4 @@ public class SearchResponse {
     private long totalCount;
     private int page;
     private int perPage;
-
-    // Backward-compatibility alias for items
-    public List<RepositoryResponse> getItems() {
-        return repositories;
-    }
-
-    public void setItems(List<RepositoryResponse> items) {
-        this.repositories = items;
-    }
 }

@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +26,7 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * REST controller exposing primary assignment endpoints under /api/github,
- * while maintaining backward-compatible aliases under /api/repositories.
+ * REST controller exposing the primary assignment endpoints under /api/github.
  */
 @Tag(name = "GitHub Repositories", description = "Core APIs: Search GitHub repositories, persist in PostgreSQL, and retrieve stored records with filters and sorting")
 @Validated
@@ -50,7 +48,7 @@ public class GitHubController {
     }
 
     @Hidden
-    @GetMapping({"/api/github/status", "/api/repositories/status"})
+    @GetMapping("/api/github/status")
     public Map<String, String> status() {
         return Map.of("status", "UP", "service", "github-searcher");
     }
@@ -71,38 +69,6 @@ public class GitHubController {
     ) {
         SearchResponse response = gitHubService.searchAndSave(request);
         return ResponseEntity.ok(response);
-    }
-
-    @Hidden
-    @PostMapping("/api/repositories/search")
-    public ResponseEntity<SearchResponse> searchGitHubRepositoriesAlias(
-            @Valid @RequestBody SearchRequest request
-    ) {
-        return searchGitHubRepositories(request);
-    }
-
-    @Hidden
-    @GetMapping({"/api/github/search", "/api/repositories/search"})
-    public ResponseEntity<SearchResponse> searchGitHubRepositoriesGet(
-            @RequestParam @NotBlank(message = "Search query must not be blank") String query,
-            @RequestParam(required = false) String language,
-            @RequestParam(required = false) Integer minStars,
-            @RequestParam(defaultValue = "stars") String sort,
-            @RequestParam(defaultValue = "desc") String order,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "30") int perPage
-    ) {
-        SearchRequest request = SearchRequest.builder()
-                .query(query)
-                .language(language)
-                .minStars(minStars)
-                .sort(sort)
-                .order(order)
-                .page(page)
-                .perPage(perPage)
-                .build();
-
-        return ResponseEntity.ok(gitHubService.searchAndSave(request));
     }
 
     @Operation(
@@ -146,19 +112,5 @@ public class GitHubController {
                 size
         );
         return ResponseEntity.ok(response);
-    }
-
-    @Hidden
-    @GetMapping("/api/repositories")
-    public ResponseEntity<RepositoryListResponse> getStoredRepositoriesAlias(
-            @RequestParam(required = false) String language,
-            @RequestParam(required = false) Integer minStars,
-            @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "stars") String sort,
-            @RequestParam(defaultValue = "DESC") String direction,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
-        return getStoredRepositories(language, minStars, search, sort, direction, page, size);
     }
 }

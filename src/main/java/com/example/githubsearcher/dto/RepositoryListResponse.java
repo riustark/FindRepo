@@ -27,10 +27,5 @@ public class RepositoryListResponse {
     private int page;
     private int size;
     private int totalPages;
-
-    // Backward-compatibility alias for content
-    public List<RepositoryResponse> getContent() {
-        return repositories;
-    }
 }
 
